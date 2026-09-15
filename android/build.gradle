@@ -1,0 +1,50 @@
+
+allprojects {
+    repositories {
+        google()
+        mavenCentral()
+    }
+}
+
+rootProject.buildDir = '../build'
+subprojects {
+    project.buildDir = "${rootProject.buildDir}/${project.name}"
+}
+subprojects {
+    project.evaluationDependsOn(':app')
+}
+
+subprojects { sub ->
+    def applyFixes = {
+        if (sub.extensions.findByName("android") != null) {
+            sub.android {
+                compileSdk 36
+                if (namespace == null || namespace.isEmpty()) {
+                    def manifest = sub.file("src/main/AndroidManifest.xml")
+                    if (manifest.exists()) {
+                        try {
+                            def parsed = new groovy.xml.XmlSlurper().parse(manifest)
+                            def pkg = parsed['@package']?.text()
+                            if (pkg) {
+                                namespace = pkg
+                            }
+                        } catch (Exception ignored) {}
+                    }
+                    if (namespace == null || namespace.isEmpty()) {
+                        namespace = (sub.group ? sub.group.toString() : "com.example.${sub.name.replace('-', '_')}")
+                    }
+                }
+            }
+        }
+    }
+
+    if (sub.state.executed) {
+        applyFixes()
+    } else {
+        sub.afterEvaluate { applyFixes() }
+    }
+}
+
+tasks.register("clean", Delete) {
+    delete rootProject.buildDir
+}

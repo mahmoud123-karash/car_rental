@@ -1,0 +1,21 @@
+import 'package:car_rental/core/shared/assets.dart';
+import 'package:flutter/material.dart';
+
+class DriverIconChatWidget extends StatelessWidget {
+  const DriverIconChatWidget({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: () {},
+      child: CircleAvatar(
+        radius: 22,
+        backgroundColor: const Color(0xff4CE5B1),
+        child: Padding(
+          padding: const EdgeInsets.all(6.0),
+          child: Image.asset(Assets.imagesMessage),
+        ),
+      ),
+    );
+  }
+}
